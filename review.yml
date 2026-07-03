@@ -1,0 +1,146 @@
+aid: photonengine
+name: Photon Engine
+review:
+  question: Does Photon Engine expose a documented public WebSocket API?
+  answer: true
+  date: '2026-07-03'
+  reviewer: API Evangelist
+  asyncapiSpecCreated: true
+  asyncapiScopeNote: |
+    An AsyncAPI 2.6 document was created at asyncapi/photonengine-asyncapi.yml
+    modeling Photon's WebSocket transport for the Realtime protocol. This is
+    a different situation from a typical AsyncAPI candidate (like an SSE or
+    JSON WebSocket stream): Photon's WebSocket transport carries the same
+    proprietary binary message envelope (operation requests, operation
+    responses, events) that Photon also carries over UDP and TCP - it is not
+    a JSON message API. The AsyncAPI document is explicit about this
+    (x-transport-notes.isJson: false) and models the connection life cycle
+    and message envelope structure rather than a literal wire-byte schema.
+  findings:
+    summary: |
+      Photon Engine documents WebSocket (ws:// and wss://) as a first-class,
+      official transport for its core Realtime multiplayer protocol -
+      alongside UDP and TCP - not an unofficial or community workaround.
+      Multiple official Photon Engine documentation pages describe exact
+      configuration: clients set ConnectionProtocol to WebSocket or
+      WebSocketSecure; unsecured WebSocket uses port 80 and secured
+      WebSocket (wss://) uses port 443; self-hosted Photon Server's
+      WebSocket listener defaults to port 9090 (Master) / 9091 (GameServer,
+      secure), while Photon Cloud's equivalent listener is documented at
+      port 19090. WebSocket is the transport Photon recommends for WebGL and
+      other browser-hosted game clients, which cannot open raw UDP/TCP
+      sockets. This applies to Photon Realtime and everything layered on top
+      of it (PUN, Fusion, Quantum, Voice, Chat), since they all share the
+      same transport layer. This is a materially different situation from
+      Groq (SSE only, no WebSocket) or Sequin (pure REST, no WebSocket): here
+      an official, named, configurable WebSocket transport exists and is
+      documented with specific ports and connection-protocol settings across
+      several first-party doc pages (Secure Networks, WebSocket SSL Setup).
+      The important caveat: the payload carried over that WebSocket
+      connection is Photon's own binary protocol (eNet-style commands
+      wrapping operation codes and parameter hashtables), not JSON text
+      frames - so while the transport question is answered "true," this is
+      not a JSON WebSocket chat/streaming API in the conventional sense.
+    openSource: |
+      Photon's client SDKs are largely source-available/open on GitHub
+      (github.com/exitgames and product-specific repos); the Photon Server
+      and Photon Cloud backend are proprietary, closed-source, hosted
+      infrastructure (or licensed on-premise Photon Server software).
+    transports:
+      - protocol: UDP
+        scheme: udp
+        documented: true
+        note: Default transport; reliable and unreliable channels. Not modeled in AsyncAPI (binary, connectionless framing differs from WebSocket).
+      - protocol: TCP
+        scheme: tcp
+        documented: true
+        note: Alternate reliable/ordered transport, same binary message envelope as UDP and WebSocket.
+      - protocol: WebSocket
+        scheme: ws / wss
+        documented: true
+        note: >-
+          ConnectionProtocol.WebSocket (ws://, port 80) or
+          ConnectionProtocol.WebSocketSecure (wss://, port 443). Self-hosted
+          Master listener default port 9090; Photon Cloud equivalent port
+          19090. Primary transport for WebGL/browser clients. Carries the
+          same binary protocol as UDP/TCP, not JSON.
+      - protocol: HTTP (Room Lifecycle WebHooks)
+        scheme: https
+        documented: true
+        note: Outbound only - Photon's Game Server POSTs to a developer-hosted BaseUrl. Not a client-callable REST API.
+      - protocol: HTTP (Custom Authentication)
+        scheme: https
+        documented: true
+        note: Outbound only - Photon's server calls a developer-hosted AuthUrl to validate client credentials.
+      - protocol: REST (general-purpose, client-callable)
+        scheme: https
+        documented: false
+        note: No documented public REST API exists for gameplay, account management, or CCU/usage reporting; the Photon Cloud Dashboard is a web UI, not a documented public API.
+    endpointsConfirmedRest: []
+    endpointsModeled:
+      - 'POST {BaseUrl}/Create  (Room Lifecycle WebHook: PathCreate)'
+      - 'POST {BaseUrl}/BeforeJoin  (Room Lifecycle WebHook: PathBeforeJoin)'
+      - 'POST {BaseUrl}/Join  (Room Lifecycle WebHook: PathJoin)'
+      - 'POST {BaseUrl}/Leave  (Room Lifecycle WebHook: PathLeave)'
+      - 'POST {BaseUrl}/Event  (Room Lifecycle WebHook: PathEvent)'
+      - 'POST {BaseUrl}/GameProperties  (Room Lifecycle WebHook: PathGameProperties)'
+      - 'POST {BaseUrl}/Close  (Room Lifecycle WebHook: PathClose)'
+      - 'GET {AuthUrl}/CustomAuth  (Custom Authentication verdict endpoint, path/method illustrative - Photon does not fix this route, only the AuthUrl host)'
+    endpointsConfirmedWebSocketTransport:
+      - 'wss://ns.exitgames.com:443 (Photon Cloud Name Server, WebSocketSecure)'
+      - 'ws://<self-hosted-host>:9090 / wss://<self-hosted-host>:9091 (self-hosted Photon Server Master/GameServer WebSocket listeners)'
+      - 'wss://<photon-cloud-master>:19090 (Photon Cloud Master Server WebSocket listener)'
+  sources:
+    - url: https://doc.photonengine.com/realtime/current/connection-and-authentication/secure-networks
+      type: Documentation
+      note: 'States ConnectionProtocol WebSocketSecure + port 443 (wss) / port 80 (ws) explicitly.'
+    - url: https://doc.photonengine.com/server/v4/operations/websockets-ssl-setup
+      type: Documentation
+      note: Self-hosted WebSocket listener setup, ports 9090/9091, ws:// and wss:// schemes, SSL certificate configuration.
+    - url: https://doc.photonengine.com/realtime/current/getting-started/realtime-intro
+      type: Documentation
+      note: Name Server / Master Server / Game Server architecture; confirms UDP, TCP, WebSocket as supported transports.
+    - url: https://doc.photonengine.com/realtime/current/reference/binary-protocol
+      type: APIReference
+      note: Describes the binary message envelope (eNet header, operation header, operation/event codes) shared across all transports.
+    - url: https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks
+      type: Documentation
+      note: Room Lifecycle WebHooks - PathCreate/BeforeJoin/Join/Leave/Event/GameProperties/Close, JSON ResultCode contract, BaseUrl configuration.
+    - url: https://doc.photonengine.com/server/current/applications/loadbalancing/webhooks
+      type: Documentation
+      note: Server-side webhook configuration (plugin.config) confirming the same outbound HTTP POST contract.
+    - url: https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication
+      type: Documentation
+      note: Custom Authentication webservice contract - Photon forwards client auth values to a developer-hosted AuthUrl.
+    - url: https://doc.photonengine.com/voice/current/getting-started/voice-intro
+      type: Documentation
+      note: Confirms Photon Voice is built directly on Photon Realtime and inherits its transport (including WebSocket).
+    - url: https://blog.photonengine.com/photon-pricing-explained/
+      type: Documentation
+      note: CCU-based pricing model and 500 msg/s per room fair-use guideline.
+    - url: https://blog.photonengine.com/multiplayer-pricing-made-simple/
+      type: Documentation
+      note: Plus/Growth/Premium Cloud tier pricing figures.
+    - url: https://blog.photonengine.com/new-free-100-ccu-for-photon-fusion-and-quantum-games/
+      type: Documentation
+      note: Free 100 CCU tier terms and restrictions.
+  actions:
+    asyncapiPath: asyncapi/photonengine-asyncapi.yml
+    apisYmlUpdated: true
+    reason: |
+      Photon documents an official, configurable WebSocket transport
+      (ws://, wss://) for its core Realtime protocol, used prominently by
+      WebGL/browser clients, with specific ports and ConnectionProtocol
+      settings across multiple first-party pages - a real "yes" for this
+      review question. An AsyncAPI 2.6 document was authored to describe
+      that WebSocket connection's life cycle and binary message envelope,
+      with explicit, repeated notes that the payload is Photon's proprietary
+      binary protocol and not JSON, so the "documented WebSocket API"
+      finding is never misread as "documented JSON WebSocket API." Separately,
+      an OpenAPI document was authored for the one genuine (if inverted)
+      HTTP surface - Room Lifecycle WebHooks and the Custom Authentication
+      webservice contract - clearly framed as endpoints the developer hosts
+      for Photon to call, not endpoints Photon hosts for developers to call.
+      No collections/ artifact was produced because there is no
+      developer-callable REST API to build a Postman/Open Collection
+      against.

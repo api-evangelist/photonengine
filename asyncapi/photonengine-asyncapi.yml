@@ -1,0 +1,241 @@
+asyncapi: '2.6.0'
+id: 'urn:com:photonengine:realtime:websocket'
+info:
+  title: Photon Realtime Transport Protocol over WebSocket
+  version: '1.0.0'
+  description: |
+    AsyncAPI 2.6 description of Photon's **WebSocket transport** for the
+    Photon Realtime binary protocol.
+
+    Photon Realtime (and everything built on it - PUN, Fusion, Quantum,
+    Voice, Chat) is **not** a JSON API. It is a proprietary binary message
+    protocol - operation requests, operation responses, and events, framed
+    inside eNet-style commands (documented at
+    https://doc.photonengine.com/realtime/current/reference/binary-protocol)
+    - that can be carried over three transports: UDP (default, reliable and
+    unreliable channels), TCP, and **WebSocket**.
+
+    WebSocket is explicitly documented as a first-class transport, not a
+    workaround: clients set `ConnectionProtocol` to `WebSocket` or
+    `WebSocketSecure`, and per
+    https://doc.photonengine.com/realtime/current/connection-and-authentication/secure-networks
+    "Configure your client to use the protocol WebSocketSecure and set the
+    port to 443 for it... Make sure the port is 80 for ws or 443 for wss."
+    Self-hosted Photon Server's WebSocket listener defaults to port 9090
+    (Master) / 9091 (GameServer secure) per
+    https://doc.photonengine.com/server/v4/operations/websockets-ssl-setup;
+    Photon Cloud uses port 19090 for the equivalent Master listener. WebSocket
+    is the primary transport used by WebGL and other browser-hosted game
+    clients, which cannot open raw UDP/TCP sockets.
+
+    IMPORTANT HONESTY NOTE: unlike Groq's SSE stream or a typical JSON
+    WebSocket API, the *payload* carried over this WebSocket connection is
+    Photon's own binary wire format, not JSON text frames. This document
+    models the **connection life cycle and message envelope** (operation
+    request / operation response / event, with their code + parameter
+    structure) as officially described in Photon's binary protocol
+    reference; it does not - and cannot - fully reproduce the byte-level
+    encoding here. Treat the `payload` schemas below as a structural
+    description of the binary envelope, not a literal JSON schema of the
+    wire bytes.
+  contact:
+    name: API Evangelist
+    email: kin@apievangelist.com
+    url: https://apievangelist.com
+  license:
+    name: API documentation - Photon Engine Terms of Service
+    url: https://www.photonengine.com/en-us/photon/terms-of-service
+  x-transport-notes:
+    transport: WebSocket (ws:// unsecured, wss:// secured)
+    protocol: ws / wss
+    direction: bidirectional
+    mediaType: application/octet-stream (Photon binary protocol, not JSON text frames)
+    alternativeTransports:
+      - UDP (default; reliable and unreliable channels)
+      - TCP
+    connectionSequence: 'Name Server (region list + auth) -> Master Server (matchmaking/lobby) -> Game Server (room gameplay)'
+    isJson: false
+    source: https://doc.photonengine.com/realtime/current/connection-and-authentication/secure-networks
+defaultContentType: application/octet-stream
+servers:
+  nameServer:
+    url: ns.exitgames.com:{port}
+    protocol: wss
+    protocolVersion: '13'
+    description: |
+      Photon Cloud Name Server, reachable over WebSocketSecure. The Name
+      Server returns the region list and hands the client off to a regional
+      Master Server, which in turn hands the client off to a Game Server for
+      actual room gameplay. Self-hosted deployments configure their own
+      WebSocket listener (default port 9090 Master / 9091 GameServer
+      secure); Photon Cloud's equivalent Master listener is port 19090.
+    variables:
+      port:
+        default: '443'
+        description: 443 for wss (WebSocketSecure); 80 for plain ws.
+        enum:
+          - '443'
+          - '80'
+    bindings:
+      ws:
+        method: GET
+        bindingVersion: '0.1.0'
+channels:
+  /photon/ws:
+    description: |
+      Single duplex WebSocket connection used for the entire Photon session
+      against whichever server role (Name Server, Master Server, or Game
+      Server) the client currently addresses. There is no per-message-type
+      URL path in the real protocol; this channel represents the one
+      long-lived socket carrying every operation request, operation
+      response, and event for the connection's lifetime.
+    bindings:
+      ws:
+        method: GET
+        bindingVersion: '0.1.0'
+    publish:
+      operationId: sendOperationRequest
+      summary: Client sends an Operation Request (e.g. Connect, JoinLobby, JoinRoom, CreateRoom, RaiseEvent, SetProperties).
+      description: |
+        The client sends a binary Operation Request: an 8-byte operation
+        header carrying an operation code (uint8) plus a serialized
+        hashtable of parameters (parameter code -> value), as described at
+        https://doc.photonengine.com/realtime/current/reference/binary-protocol.
+        Common operations include Authenticate, JoinLobby, JoinRandomRoom,
+        CreateGame, JoinGame, Leave, RaiseEvent, and SetProperties.
+      message:
+        $ref: '#/components/messages/OperationRequest'
+    subscribe:
+      operationId: receiveOperationResponseOrEvent
+      summary: Server sends an Operation Response or an Event.
+      description: |
+        The server replies to each Operation Request with an Operation
+        Response carrying the same operation code plus a return code and
+        optional debug string, and independently pushes Events (for example
+        RaiseEvent broadcasts from other actors, or Join/Leave notifications)
+        identified by an event code and a data hashtable.
+      message:
+        oneOf:
+          - $ref: '#/components/messages/OperationResponse'
+          - $ref: '#/components/messages/EventData'
+components:
+  messages:
+    OperationRequest:
+      name: OperationRequest
+      title: Operation Request (binary)
+      summary: Client-to-server request identified by an operation code.
+      contentType: application/octet-stream
+      description: |
+        Binary envelope: 8-byte operation header (operation code + parameter
+        count) followed by a serialized parameter hashtable (parameter code
+        -> typed value). Structurally summarized in JSON below for
+        readability; the wire format is Photon's own binary serialization,
+        not JSON.
+      payload:
+        $ref: '#/components/schemas/OperationEnvelope'
+      examples:
+        - name: joinRandomRoom
+          summary: Structural summary of a JoinRandomRoom operation request.
+          payload:
+            operationCode: 226
+            operationName: JoinRandomRoom
+            parameters:
+              expectedMaxPlayers: 4
+              matchmakingMode: 0
+    OperationResponse:
+      name: OperationResponse
+      title: Operation Response (binary)
+      summary: Server-to-client reply to a specific operation code.
+      contentType: application/octet-stream
+      description: |
+        Binary envelope carrying the same operation code as the triggering
+        request, a return code (0 = OK), an optional debug string, and a
+        parameter hashtable of result values.
+      payload:
+        $ref: '#/components/schemas/OperationResponseEnvelope'
+      examples:
+        - name: joinRandomRoomOk
+          summary: Structural summary of a successful JoinRandomRoom response.
+          payload:
+            operationCode: 226
+            operationName: JoinRandomRoom
+            returnCode: 0
+            debugMessage: null
+            parameters:
+              roomName: room-af31c
+              actorNr: 2
+    EventData:
+      name: EventData
+      title: Event (binary)
+      summary: Server-pushed event identified by an event code.
+      contentType: application/octet-stream
+      description: |
+        Binary envelope carrying an event code (uint8) and a parameter/data
+        hashtable, pushed by the server without a corresponding client
+        request - for example, custom gameplay events raised via
+        RaiseEvent, or built-in Join/Leave/PropertiesChanged notifications.
+      payload:
+        $ref: '#/components/schemas/EventEnvelope'
+      examples:
+        - name: playerJoinedEvent
+          summary: Structural summary of a built-in "actor joined" event.
+          payload:
+            eventCode: 254
+            eventName: Join
+            data:
+              actorNr: 3
+              actorProperties:
+                nickName: player3
+  schemas:
+    OperationEnvelope:
+      type: object
+      description: Structural summary of a binary Operation Request. Not a literal wire schema.
+      required:
+        - operationCode
+      properties:
+        operationCode:
+          type: integer
+          description: uint8 operation code identifying the requested action.
+        operationName:
+          type: string
+          description: Human-readable operation name (e.g. JoinRandomRoom, RaiseEvent, SetProperties).
+        parameters:
+          type: object
+          additionalProperties: true
+          description: Serialized hashtable of parameter code -> typed value.
+    OperationResponseEnvelope:
+      type: object
+      description: Structural summary of a binary Operation Response. Not a literal wire schema.
+      required:
+        - operationCode
+        - returnCode
+      properties:
+        operationCode:
+          type: integer
+        operationName:
+          type: string
+        returnCode:
+          type: integer
+          description: 0 indicates success; non-zero values are operation-specific error codes.
+        debugMessage:
+          type: string
+          nullable: true
+        parameters:
+          type: object
+          additionalProperties: true
+    EventEnvelope:
+      type: object
+      description: Structural summary of a binary Event. Not a literal wire schema.
+      required:
+        - eventCode
+      properties:
+        eventCode:
+          type: integer
+          description: uint8 event code identifying the event type.
+        eventName:
+          type: string
+          description: Human-readable event name where a built-in code applies (e.g. Join, Leave, PropertiesChanged).
+        data:
+          type: object
+          additionalProperties: true
+          description: Serialized hashtable of event data.

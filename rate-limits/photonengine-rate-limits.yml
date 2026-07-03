@@ -1,0 +1,96 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: Photon Engine
+providerId: photonengine
+created: '2026-07-03'
+modified: '2026-07-03'
+reconciled: false
+tags:
+- Gaming
+- Multiplayer
+- Realtime
+- Rate Limiting
+- Fair Use
+description: >-
+  Photon does not rate-limit its Realtime transport protocol the way a REST
+  API throttles requests per minute. Instead, capacity is governed by the
+  purchased Concurrent Users (CCU) plan (see plans/photonengine-plans-pricing.yml),
+  and Photon publishes a fair-use guideline - not a hard-enforced cap - on
+  messages per second per room, plus hard technical limits on message size
+  and unreliable-command buffering. The Room Lifecycle WebHooks and Custom
+  Authentication HTTP callbacks (outbound from Photon to the developer's
+  server) are not documented with an explicit rate limit, but respond within
+  the same room-join / operation flow they are triggered from, so slow
+  webhook responses can delay gameplay operations.
+notes: >-
+  Photon states it "does not enforce" the messages-per-second guideline but
+  relies on a fair-use policy and may act against rooms that greatly exceed
+  it; there is no published numeric SLA for webhook or custom-auth response
+  time, though slow responses will be perceived as latency by connected
+  clients.
+sources:
+- https://doc.photonengine.com/realtime/current/reference/performance-tips
+- https://forum.photonengine.com/discussion/12597/message-limits-per-room-enforced
+- https://gist.github.com/bddckr/c4c287451a0a36568353ce9ec0582eaa
+- https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks
+responseCodes:
+  operationFailed: non-zero returnCode on an Operation Response
+  webhookFailed: non-zero ResultCode on a WebHook / Custom Authentication response
+limits:
+- name: Messages Per Second Per Room (fair use)
+  scope: room
+  metric: messages
+  limit: 500
+  notes: >-
+    Photon recommends keeping combined inbound+outbound messages per second
+    per room under ~500; not hard-enforced, but rooms that greatly exceed it
+    are subject to Photon's fair-use policy and may be throttled or the
+    account contacted.
+- name: Concurrent Users (CCU)
+  scope: application
+  metric: concurrent_users
+  limit: see plans/photonengine-plans-pricing.yml
+  notes: >-
+    The actual capacity ceiling is the purchased CCU plan; exceeding it can
+    cause connection refusals until the plan is upgraded or CCU Burst (500+
+    CCU plans) absorbs the spike.
+- name: Message / Payload Size
+  scope: connection
+  metric: bytes
+  limit: 1200
+  notes: >-
+    Messages larger than ~1.2 KB (including protocol overhead) are split
+    across multiple UDP packets by the client SDK.
+- name: Per-Client Buffer Size
+  scope: connection
+  metric: bytes
+  limit: 500000
+  notes: >-
+    On Photon Cloud, a client that fills its outgoing buffer (roughly
+    500 KB) in a short period is disconnected by the server.
+- name: Unreliable Command Queue
+  scope: connection
+  metric: commands
+  limit: 20
+  notes: LoadBalancingPeer.LimitOfUnreliableCommands defaults to 20 queued unreliable commands.
+policies:
+- name: Fair Use, Not Hard Throttling
+  description: >-
+    Photon Realtime relies on a fair-use policy for messages-per-second
+    rather than issuing HTTP-style 429 responses; there is no request-based
+    throttling because there is no request-response REST surface for
+    gameplay traffic.
+- name: CCU Burst
+  description: >-
+    500+ CCU plans include a temporary burst allowance above the plan's CCU
+    ceiling at no extra charge, smoothing short spikes without a hard cutoff.
+- name: WebHook / Custom Auth Timeout Sensitivity
+  description: >-
+    Because WebHooks and Custom Authentication are called synchronously
+    within a room-join or property-change operation, a slow-responding
+    developer-hosted endpoint is experienced by players as added latency or
+    a failed operation rather than a rate-limit error.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

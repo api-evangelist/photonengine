@@ -1,0 +1,97 @@
+specification: FinOps Framework
+specificationVersion: '1.0'
+schema: https://www.finops.org/framework/
+provider: Photon Engine
+providerId: photonengine
+created: '2026-07-03'
+modified: '2026-07-03'
+reconciled: false
+tags:
+- Gaming
+- Multiplayer
+- Realtime
+- FinOps
+- Cost Management
+- FOCUS
+description: >-
+  FinOps view of Photon spend. Unlike token- or request-metered APIs, Photon
+  bills primarily against a provisioned Concurrent Users (CCU) capacity plan
+  per application (Fusion, Quantum, Realtime, Voice, Chat each billed
+  separately), with bundled traffic allowances at higher tiers and a per-CCU
+  overage rate on Premium Cloud. There is no per-message or per-webhook-call
+  charge documented for Room Lifecycle WebHooks or Custom Authentication -
+  those ride on the same CCU-provisioned capacity.
+notes: >-
+  Because pricing is capacity-based (peak CCU) rather than usage-based (API
+  calls/tokens), the primary FinOps lever is right-sizing the CCU plan to
+  actual concurrent-player peaks, not reducing call volume.
+sources:
+- https://blog.photonengine.com/photon-pricing-explained/
+- https://blog.photonengine.com/multiplayer-pricing-made-simple/
+- https://www.photonengine.com/fusion/pricing
+- https://focus.finops.org/focus-specification/v1-3/
+alignedWith:
+  framework: FinOps Foundation Framework
+  frameworkUrl: https://www.finops.org/framework/
+  dataSpec: FOCUS
+  dataSpecVersion: '1.3'
+  dataSpecUrl: https://focus.finops.org/focus-specification/v1-3/
+publisherName: Photon Engine
+serviceCategory: Gaming and Multiplayer Networking
+billingModel:
+  pricingCategory: Capacity-Based (CCU)
+  billingFrequency: Monthly or Annual
+  billingCurrency: USD
+  chargeCategories:
+  - Purchase
+  - Usage
+  - Adjustment
+focusColumns:
+  ServiceName: Photon Cloud
+  ServiceCategory: Gaming and Multiplayer Networking
+  ProviderName: Photon Engine
+  PublisherName: Photon Engine
+  InvoiceIssuerName: Photon Engine
+  BillingCurrency: USD
+  ChargeCategory: Purchase
+  PricingCategory: Capacity-Based
+meters:
+- name: peak_ccu
+  description: Peak concurrent users observed against the provisioned CCU plan, per application/product.
+  unit: concurrent_users
+  aggregation: max
+  dimensions:
+  - application
+  - product
+  - region
+- name: ccu_burst
+  description: Temporary overage above the plan's CCU ceiling absorbed at no extra charge on 500+ CCU plans.
+  unit: concurrent_users
+  aggregation: max
+  dimensions:
+  - application
+  - product
+- name: bundled_traffic_gb
+  description: Traffic allowance bundled into Growth-tier plans (for example ~1.5 TB at 500 CCU, ~6 TB at 2,000 CCU).
+  unit: gigabytes
+  aggregation: sum
+  dimensions:
+  - application
+- name: premium_cloud_ccu_overage
+  description: Per-CCU charge applied on Premium Cloud once a title scales past the top public-cloud tier.
+  unit: concurrent_users
+  aggregation: max
+  dimensions:
+  - application
+principles:
+- name: Visibility
+  description: Monitor peak CCU per application in the Photon Dashboard; compare against the provisioned plan ceiling before it forces an upgrade or throttles new connections.
+- name: Allocation
+  description: Provision a separate Photon application (and CCU plan) per game/product/environment so spend maps cleanly to a team or title.
+- name: Optimization
+  description: Right-size the CCU tier to observed peaks rather than worst-case guesses; use the annual-commitment discount (two months free) once usage is stable; consolidate Voice/Chat onto the same title's traffic patterns when possible.
+- name: Accountability
+  description: Assign an owner per Photon application; review CCU headroom and Premium Cloud overage monthly, especially around launches and live events that spike concurrency.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

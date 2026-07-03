@@ -1,0 +1,176 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: Photon Engine
+providerId: photonengine
+created: '2026-07-03'
+modified: '2026-07-03'
+reconciled: false
+tags:
+- Gaming
+- Multiplayer
+- Realtime
+- CCU
+- Plans
+description: >-
+  Photon prices its multiplayer backend (Fusion, Quantum, Realtime, PUN,
+  Voice, Chat) by peak Concurrent Users (CCU) rather than requests, bandwidth,
+  or DAU/MAU. Each product (Fusion, Quantum, Realtime, Voice, Chat) has its
+  own CCU-tiered plan on the Photon Dashboard; tiers below are representative
+  and were last confirmed via Photon's public pricing blog posts. The live
+  pricing pages (photonengine.com/<product>/pricing) sit behind a bot/CDN
+  challenge (Gcore) that blocked automated verification during this review -
+  reconcile against the live dashboard before relying on exact figures.
+notes: >-
+  Photon has changed free-tier CCU limits at least once (20 CCU raised to
+  100 CCU); treat the numeric limits and prices below as directionally
+  accurate and reconcile against https://www.photonengine.com/fusion/pricing,
+  https://www.photonengine.com/quantum/pricing, and
+  https://www.photonengine.com/realtime/pricing.
+sources:
+- https://blog.photonengine.com/multiplayer-pricing-made-simple/
+- https://blog.photonengine.com/new-200-ccu-plus-package-100-paid-100-free/
+- https://blog.photonengine.com/new-free-100-ccu-for-photon-fusion-and-quantum-games/
+- https://blog.photonengine.com/photon-pricing-explained/
+- https://www.photonengine.com/fusion/pricing
+- https://www.photonengine.com/quantum/pricing
+- https://www.photonengine.com/realtime/pricing
+plans:
+- id: photonengine-free-100-ccu
+  name: Free (100 CCU)
+  type: free
+  description: >-
+    Free forever tier for one application, applicable to Fusion, Quantum,
+    Realtime, or PUN. Roughly 100 concurrent users maps to an estimated
+    40,000 MAU. Cannot be combined with a paid CCU plan and cannot be
+    downgraded once activated; only one app per studio may use it.
+  entries:
+  - label: Concurrent Users
+    name: ccu
+    type: usage
+    metric: concurrent_users
+    limit: 100
+    timeFrame: realtime
+    geo: global
+    unit: 1
+    price: Free
+    userMultiplied: false
+  elements:
+  - name: Realtime Transport
+  - name: Room Lifecycle WebHooks
+  - name: Custom Authentication
+- id: photonengine-plus-200-ccu
+  name: Plus (200 CCU)
+  type: flat
+  description: >-
+    Combines a paid 100 CCU Plus package with the 100 CCU free tier for a
+    total of 200 CCU, billed annually. Roughly 200 CCU maps to an estimated
+    4,000 DAU / 80,000 MAU.
+  entries:
+  - label: Plus Annual Plan
+    name: plus_annual
+    type: flat
+    metric: subscription
+    limit: 200
+    timeFrame: year
+    geo: global
+    unit: 1
+    price: $95 per year
+    userMultiplied: false
+  elements:
+  - name: Realtime Transport
+  - name: Room Lifecycle WebHooks
+  - name: Custom Authentication
+- id: photonengine-growth-500-ccu
+  name: Growth (500 CCU)
+  type: flat
+  description: >-
+    Mid-tier public cloud plan bundling a traffic allowance; annual
+    commitment discounts are available (two months free on a 1-year
+    commitment for 500/1,000/2,000 CCU tiers).
+  entries:
+  - label: Growth 500 CCU
+    name: growth_500
+    type: flat
+    metric: subscription
+    limit: 500
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: $125 per month (includes ~1.5 TB traffic)
+    userMultiplied: false
+  elements:
+  - name: Realtime Transport
+  - name: Room Lifecycle WebHooks
+  - name: Custom Authentication
+  - name: CCU Burst
+- id: photonengine-growth-2000-ccu
+  name: Growth (2,000 CCU)
+  type: flat
+  description: >-
+    Top public-cloud self-serve tier before moving to per-CCU Premium Cloud
+    pricing.
+  entries:
+  - label: Growth 2,000 CCU
+    name: growth_2000
+    type: flat
+    metric: subscription
+    limit: 2000
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: $500 per month (includes ~6 TB traffic)
+    userMultiplied: false
+  elements:
+  - name: Realtime Transport
+  - name: Room Lifecycle WebHooks
+  - name: Custom Authentication
+  - name: CCU Burst
+- id: photonengine-premium-cloud
+  name: Premium Cloud (2,000+ CCU)
+  type: usage
+  description: >-
+    Beyond 2,000 CCU, Photon migrates titles to a per-CCU Premium Cloud rate
+    that adds DDoS protection and SLA support.
+  entries:
+  - label: Premium Cloud CCU
+    name: premium_ccu
+    type: usage
+    metric: concurrent_users
+    limit: -1
+    timeFrame: month
+    geo: global
+    unit: 1
+    price: $0.50 per CCU per month (approximate; reconcile with sales)
+    userMultiplied: false
+  elements:
+  - name: DDoS Protection
+  - name: SLA Support
+  - name: Server-Authoritative Plugins
+- id: photonengine-enterprise-cloud
+  name: Enterprise Cloud
+  type: enterprise
+  description: >-
+    Dedicated / self-hosted or hybrid deployment tier for the largest
+    titles, with negotiated terms, guaranteed service levels, and dedicated
+    infrastructure. Seamless migration between Public, Premium, and
+    Enterprise Cloud without service interruption. Contact Photon sales.
+  entries:
+  - label: Enterprise Agreement
+    name: enterprise
+    type: flat
+    metric: contract
+    limit: -1
+    timeFrame: year
+    geo: global
+    unit: 1
+    price: contact sales
+    userMultiplied: false
+  elements:
+  - name: Guaranteed SLA
+  - name: Dedicated Infrastructure
+  - name: Server-Authoritative Plugins
+  - name: Priority Support
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

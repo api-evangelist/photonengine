@@ -217,6 +217,10 @@ apis:
     authorized. Like WebHooks, the developer hosts the server and Photon is
     the caller.
 common:
+- type: VulnerabilityDisclosure
+  url: security/photonengine-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/photonengine-domain-security.yml
 - type: GitHubOrganization
   url: https://github.com/exitgames
 - type: LinkedIn

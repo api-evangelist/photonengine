@@ -217,6 +217,8 @@ apis:
     authorized. Like WebHooks, the developer hosts the server and Photon is
     the caller.
 common:
+- type: AgenticAccess
+  url: agentic-access/photonengine-agentic-access.yml
 - type: VulnerabilityDisclosure
   url: security/photonengine-vulnerability-disclosure.yml
 - type: DomainSecurity

@@ -1,0 +1,58 @@
+openapi: 3.0.3
+info:
+  title: Photon WebHooks and Webservice Contract Custom Authentication API
+  description: "IMPORTANT SCOPE NOTE: Photon Engine does not publish a general-purpose REST API that developers call. Photon's core products (Realtime, PUN, Fusion, Quantum, Voice, Chat) speak a proprietary binary protocol over UDP, TCP, or WebSocket - modeled separately in asyncapi/photonengine-asyncapi.yml, not here.\nThis document instead models the two genuinely HTTP surfaces in the Photon stack, both of which run in the opposite direction from a typical provider API: Photon's Game Server is the HTTP *client*, and the game developer must implement and host the HTTP *server* that Photon calls.\n1. Room Lifecycle WebHooks - Photon POSTs JSON payloads to a\n   developer-configured BaseUrl at points in a room's lifecycle\n   (creation, before join, join, leave, custom event, property change,\n   close), documented at\n   https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks\n   and https://doc.photonengine.com/server/current/applications/loadbalancing/webhooks.\n\n2. Custom Authentication - when enabled, Photon's server forwards a\n   connecting client's authentication values to a developer-configured\n   AuthUrl and expects a JSON verdict, documented at\n   https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication.\n\nThe paths below are written from the developer's point of view: each `path` is an endpoint you implement on your own server, appended to the BaseUrl / AuthUrl you register in the Photon Dashboard. Photon issues the request; your server returns the response. There is no Photon-hosted base URL to call for any of this - `servers` below is a placeholder for your own webhook receiver."
+  version: '1.0'
+  contact:
+    name: Photon Engine
+    url: https://www.photonengine.com
+  license:
+    name: API documentation - Photon Engine Terms of Service
+    url: https://www.photonengine.com/en-us/photon/terms-of-service
+servers:
+- url: '{yourBaseUrl}'
+  description: Placeholder for the developer-hosted BaseUrl (WebHooks) or AuthUrl (Custom Authentication) registered in the Photon Cloud Dashboard. Photon calls this host; it is not operated by Photon.
+  variables:
+    yourBaseUrl:
+      default: https://your-service.example.com
+tags:
+- name: Custom Authentication
+  description: Endpoint Photon's server calls to validate a connecting client's credentials. You implement this; Photon is the caller.
+paths:
+  /CustomAuth:
+    get:
+      operationId: handleCustomAuthentication
+      tags:
+      - Custom Authentication
+      summary: Custom Authentication verdict endpoint
+      description: Placeholder path representing the AuthUrl registered in the Photon Dashboard for Custom Authentication. Photon's server forwards the client-supplied authentication values (as query-string parameters by default, or as a POST body depending on configuration) and expects a JSON verdict deciding whether the connection is allowed. The exact parameter names are whatever the client sends as AuthenticationValues; Photon does not itself define them.
+      parameters:
+      - name: token
+        in: query
+        required: false
+        description: Example client-supplied credential parameter. Real parameter names are defined by the game's own AuthenticationValues, not by Photon.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Authentication verdict. `ResultCode: 1` (or equivalent success indicator per the developer''s own contract) allows the connection; Data may carry additional values merged into the client''s custom authentication result.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAuthResponse'
+components:
+  schemas:
+    CustomAuthResponse:
+      type: object
+      description: Shape is a developer/Photon convention, not a fixed Photon schema. The commonly documented pattern uses ResultCode plus an optional Data object merged into the client AuthenticationValues.
+      properties:
+        ResultCode:
+          type: integer
+          description: 1 (or the developer's chosen success code) allows the connection.
+        Data:
+          type: object
+          additionalProperties: true
+          description: Optional extra values merged into the client's auth result.
+        Message:
+          type: string
+          description: Optional message returned to the client on failure.

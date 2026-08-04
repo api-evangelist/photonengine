@@ -1,0 +1,348 @@
+openapi: 3.0.3
+info:
+  title: Photon WebHooks and Custom Authentication Webservice Contract
+  description: >-
+    IMPORTANT SCOPE NOTE: Photon Engine does not publish a general-purpose
+    REST API that developers call. Photon's core products (Realtime, PUN,
+    Fusion, Quantum, Voice, Chat) speak a proprietary binary protocol over
+    UDP, TCP, or WebSocket - modeled separately in
+    asyncapi/photonengine-asyncapi.yml, not here.
+
+    This document instead models the two genuinely HTTP surfaces in the
+    Photon stack, both of which run in the opposite direction from a typical
+    provider API: Photon's Game Server is the HTTP *client*, and the game
+    developer must implement and host the HTTP *server* that Photon calls.
+
+    1. Room Lifecycle WebHooks - Photon POSTs JSON payloads to a
+       developer-configured BaseUrl at points in a room's lifecycle
+       (creation, before join, join, leave, custom event, property change,
+       close), documented at
+       https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks
+       and https://doc.photonengine.com/server/current/applications/loadbalancing/webhooks.
+
+    2. Custom Authentication - when enabled, Photon's server forwards a
+       connecting client's authentication values to a developer-configured
+       AuthUrl and expects a JSON verdict, documented at
+       https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication.
+
+    The paths below are written from the developer's point of view: each
+    `path` is an endpoint you implement on your own server, appended to the
+    BaseUrl / AuthUrl you register in the Photon Dashboard. Photon issues the
+    request; your server returns the response. There is no Photon-hosted
+    base URL to call for any of this - `servers` below is a placeholder for
+    your own webhook receiver.
+  version: '1.0'
+  contact:
+    name: Photon Engine
+    url: https://www.photonengine.com
+  license:
+    name: API documentation - Photon Engine Terms of Service
+    url: https://www.photonengine.com/en-us/photon/terms-of-service
+servers:
+  - url: '{yourBaseUrl}'
+    description: >-
+      Placeholder for the developer-hosted BaseUrl (WebHooks) or AuthUrl
+      (Custom Authentication) registered in the Photon Cloud Dashboard.
+      Photon calls this host; it is not operated by Photon.
+    variables:
+      yourBaseUrl:
+        default: https://your-service.example.com
+tags:
+  - name: Room Lifecycle WebHooks
+    description: >-
+      Endpoints Photon's Game Server calls (HTTP POST) at points in a room's
+      lifecycle. You implement these; Photon is the caller.
+  - name: Custom Authentication
+    description: >-
+      Endpoint Photon's server calls to validate a connecting client's
+      credentials. You implement this; Photon is the caller.
+paths:
+  /Create:
+    post:
+      operationId: handlePathCreate
+      tags:
+        - Room Lifecycle WebHooks
+      summary: PathCreate - room created / state load requested
+      description: >-
+        Called by Photon when a new room is created, or when an existing
+        persistent room's saved state needs to be loaded (Type "Load"). If
+        the room is persistent and you return a `State` payload, Photon
+        loads it into the room.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequestCommon'
+      responses:
+        '200':
+          description: >-
+            Acknowledgement. Return `State` when responding to a Type
+            "Load" request for a persistent room.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookLoadResponse'
+  /BeforeJoin:
+    post:
+      operationId: handlePathBeforeJoin
+      tags:
+        - Room Lifecycle WebHooks
+      summary: PathBeforeJoin - access control before a player joins
+      description: >-
+        Called before an actor is allowed to join a room, letting your
+        service approve or deny the join (for example, external ban lists
+        or entitlement checks).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequestCommon'
+      responses:
+        '200':
+          description: >-
+            ResultCode 0 allows the join; any non-zero ResultCode denies it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResultResponse'
+  /Join:
+    post:
+      operationId: handlePathJoin
+      tags:
+        - Room Lifecycle WebHooks
+      summary: PathJoin - player joined an in-memory room
+      description: Called when a player successfully joins a room already in memory.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequestCommon'
+      responses:
+        '200':
+          description: Acknowledgement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResultResponse'
+  /Leave:
+    post:
+      operationId: handlePathLeave
+      tags:
+        - Room Lifecycle WebHooks
+      summary: PathLeave - player left / disconnected
+      description: Called when a player leaves or disconnects from a room.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequestCommon'
+      responses:
+        '200':
+          description: Acknowledgement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResultResponse'
+  /Event:
+    post:
+      operationId: handlePathEvent
+      tags:
+        - Room Lifecycle WebHooks
+      summary: PathEvent - client raised a forwarded custom event
+      description: >-
+        Called when a client raises a custom event with the `HttpForward`
+        web flag set, forwarding the event data to your service.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/WebhookRequestCommon'
+                - type: object
+                  properties:
+                    Data:
+                      type: object
+                      additionalProperties: true
+                      description: The custom event payload the client raised.
+      responses:
+        '200':
+          description: Acknowledgement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResultResponse'
+  /GameProperties:
+    post:
+      operationId: handlePathGameProperties
+      tags:
+        - Room Lifecycle WebHooks
+      summary: PathGameProperties - room or player property changed
+      description: >-
+        Called when a client sets a room or player property with the
+        `HttpForward` web flag set.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/WebhookRequestCommon'
+                - type: object
+                  properties:
+                    Properties:
+                      type: object
+                      additionalProperties: true
+                      description: The changed room or player properties.
+      responses:
+        '200':
+          description: Acknowledgement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResultResponse'
+  /Close:
+    post:
+      operationId: handlePathClose
+      tags:
+        - Room Lifecycle WebHooks
+      summary: PathClose - room removed from server memory
+      description: >-
+        Called before Photon removes a room from server memory. `ActorNr`,
+        `UserId`, and `NickName` are not included, unlike other webhook
+        calls.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookRequestCommon'
+      responses:
+        '200':
+          description: Acknowledgement, optionally including final `State` for persistence.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookLoadResponse'
+  /CustomAuth:
+    get:
+      operationId: handleCustomAuthentication
+      tags:
+        - Custom Authentication
+      summary: Custom Authentication verdict endpoint
+      description: >-
+        Placeholder path representing the AuthUrl registered in the Photon
+        Dashboard for Custom Authentication. Photon's server forwards the
+        client-supplied authentication values (as query-string parameters
+        by default, or as a POST body depending on configuration) and
+        expects a JSON verdict deciding whether the connection is allowed.
+        The exact parameter names are whatever the client sends as
+        AuthenticationValues; Photon does not itself define them.
+      parameters:
+        - name: token
+          in: query
+          required: false
+          description: >-
+            Example client-supplied credential parameter. Real parameter
+            names are defined by the game's own AuthenticationValues, not by
+            Photon.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            Authentication verdict. `ResultCode: 1` (or equivalent success
+            indicator per the developer's own contract) allows the
+            connection; Data may carry additional values merged into the
+            client's custom authentication result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomAuthResponse'
+components:
+  schemas:
+    WebhookRequestCommon:
+      type: object
+      description: >-
+        Fields common to every Room Lifecycle WebHook call except PathClose,
+        which omits ActorNr, UserId, and NickName.
+      required:
+        - AppId
+        - AppVersion
+        - Region
+        - GameId
+        - Type
+      properties:
+        AppId:
+          type: string
+          description: The Photon application ID.
+        AppVersion:
+          type: string
+          description: The client application version.
+        Region:
+          type: string
+          description: The Photon Cloud region the client connected to.
+        GameId:
+          type: string
+          description: The room name/ID the webhook concerns.
+        Type:
+          type: string
+          description: The webhook type, for example "Create", "Load", "Join", "Leave".
+        ActorNr:
+          type: integer
+          description: The actor number of the triggering player (omitted on PathClose).
+        UserId:
+          type: string
+          description: The user ID of the triggering player (omitted on PathClose).
+        NickName:
+          type: string
+          description: The nickname of the triggering player (omitted on PathClose).
+    WebhookResultResponse:
+      type: object
+      required:
+        - ResultCode
+      properties:
+        ResultCode:
+          type: integer
+          description: 0 indicates success; any non-zero value is treated as a failure.
+          example: 0
+        Message:
+          type: string
+          description: Optional human-readable message, surfaced in Photon logs on failure.
+    WebhookLoadResponse:
+      type: object
+      required:
+        - ResultCode
+      properties:
+        ResultCode:
+          type: integer
+          example: 0
+        Message:
+          type: string
+        State:
+          type: object
+          additionalProperties: true
+          description: >-
+            Serialized room state, returned on a Type "Load" PathCreate call
+            or an optional PathClose call for persistent rooms.
+    CustomAuthResponse:
+      type: object
+      description: >-
+        Shape is a developer/Photon convention, not a fixed Photon schema.
+        The commonly documented pattern uses ResultCode plus an optional
+        Data object merged into the client AuthenticationValues.
+      properties:
+        ResultCode:
+          type: integer
+          description: 1 (or the developer's chosen success code) allows the connection.
+        Data:
+          type: object
+          additionalProperties: true
+          description: Optional extra values merged into the client's auth result.
+        Message:
+          type: string
+          description: Optional message returned to the client on failure.

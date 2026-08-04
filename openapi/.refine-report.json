@@ -1,0 +1,16 @@
+{
+  "provider": "photonengine",
+  "sources": [
+    "photonengine-custom-authentication-api-openapi.yml",
+    "photonengine-room-lifecycle-webhooks-api-openapi.yml"
+  ],
+  "outputs": [
+    "photonengine-custom-authentication-api-openapi.yml",
+    "photonengine-room-lifecycle-webhooks-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}

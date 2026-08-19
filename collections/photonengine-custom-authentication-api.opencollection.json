@@ -1,0 +1,37 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Photon WebHooks and Webservice Contract Custom Authentication API",
+    "version": "1.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Custom Authentication",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Custom Authentication verdict endpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{yourBaseUrl}/CustomAuth",
+            "params": [
+              {
+                "name": "token",
+                "value": "",
+                "type": "query",
+                "description": "Example client-supplied credential parameter. Real parameter names are defined by the game's own AuthenticationValues, not by Photon."
+              }
+            ]
+          },
+          "docs": "Placeholder path representing the AuthUrl registered in the Photon Dashboard for Custom Authentication. Photon's server forwards the client-supplied authentication values (as query-string parameters by default, or as a POST body depending on configuration) and expects a JSON verdict deciding whether the connection is allowed. The exact parameter names are whatever the client sends as AuthenticationValues; Photon does not itself define them."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

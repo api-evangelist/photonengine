@@ -1,0 +1,123 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Photon WebHooks and Webservice Contract Custom Authentication Room Lifecycle WebHooks API",
+    "version": "1.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Room Lifecycle WebHooks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "PathCreate - room created / state load requested",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{yourBaseUrl}/Create",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Called by Photon when a new room is created, or when an existing persistent room's saved state needs to be loaded (Type \"Load\"). If the room is persistent and you return a `State` payload, Photon loads it into the room."
+        },
+        {
+          "info": {
+            "name": "PathBeforeJoin - access control before a player joins",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{yourBaseUrl}/BeforeJoin",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Called before an actor is allowed to join a room, letting your service approve or deny the join (for example, external ban lists or entitlement checks)."
+        },
+        {
+          "info": {
+            "name": "PathJoin - player joined an in-memory room",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{yourBaseUrl}/Join",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Called when a player successfully joins a room already in memory."
+        },
+        {
+          "info": {
+            "name": "PathLeave - player left / disconnected",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{yourBaseUrl}/Leave",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Called when a player leaves or disconnects from a room."
+        },
+        {
+          "info": {
+            "name": "PathEvent - client raised a forwarded custom event",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{yourBaseUrl}/Event",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Called when a client raises a custom event with the `HttpForward` web flag set, forwarding the event data to your service."
+        },
+        {
+          "info": {
+            "name": "PathGameProperties - room or player property changed",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{yourBaseUrl}/GameProperties",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Called when a client sets a room or player property with the `HttpForward` web flag set."
+        },
+        {
+          "info": {
+            "name": "PathClose - room removed from server memory",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{yourBaseUrl}/Close",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Called before Photon removes a room from server memory. `ActorNr`, `UserId`, and `NickName` are not included, unlike other webhook calls."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

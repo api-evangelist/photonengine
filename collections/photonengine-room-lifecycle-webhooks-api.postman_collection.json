@@ -1,0 +1,818 @@
+{
+  "item": [
+    {
+      "id": "5114a369-f4c8-4339-bb87-24d13a2b1237",
+      "name": "Room Lifecycle WebHooks",
+      "description": {
+        "content": "Endpoints Photon's Game Server calls (HTTP POST) at points in a room's lifecycle. You implement these; Photon is the caller.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "05e5df35-ec6e-4e90-9b05-8725addb69da",
+          "name": "PathCreate - room created / state load requested",
+          "request": {
+            "name": "PathCreate - room created / state load requested",
+            "description": {
+              "content": "Called by Photon when a new room is created, or when an existing persistent room's saved state needs to be loaded (Type \"Load\"). If the room is persistent and you return a `State` payload, Photon loads it into the room.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "Create"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "type": "any",
+                  "value": "{{yourBaseUrl}}",
+                  "key": "yourBaseUrl"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "0c814506-0b91-4e3e-9db4-2decdf3e7621",
+              "name": "Acknowledgement. Return `State` when responding to a Type \"Load\" request for a persistent room.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "Create"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "type": "any",
+                      "value": "{{yourBaseUrl}}",
+                      "key": "yourBaseUrl"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"ResultCode\": 0,\n  \"Message\": \"string\",\n  \"State\": {\n    \"key_0\": true\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "3373d801-9421-4a58-880b-d9226f594001",
+          "name": "PathBeforeJoin - access control before a player joins",
+          "request": {
+            "name": "PathBeforeJoin - access control before a player joins",
+            "description": {
+              "content": "Called before an actor is allowed to join a room, letting your service approve or deny the join (for example, external ban lists or entitlement checks).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "BeforeJoin"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "type": "any",
+                  "value": "{{yourBaseUrl}}",
+                  "key": "yourBaseUrl"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "9e1a1738-3677-4f45-a61e-6bf38eb58dd5",
+              "name": "ResultCode 0 allows the join; any non-zero ResultCode denies it.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "BeforeJoin"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "type": "any",
+                      "value": "{{yourBaseUrl}}",
+                      "key": "yourBaseUrl"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"ResultCode\": 0,\n  \"Message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "dd78f702-c0e9-4815-ab40-e7083dc1c356",
+          "name": "PathJoin - player joined an in-memory room",
+          "request": {
+            "name": "PathJoin - player joined an in-memory room",
+            "description": {
+              "content": "Called when a player successfully joins a room already in memory.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "Join"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "type": "any",
+                  "value": "{{yourBaseUrl}}",
+                  "key": "yourBaseUrl"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "e29e2a0a-aa4b-4abd-838a-ad8f3123294d",
+              "name": "Acknowledgement.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "Join"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "type": "any",
+                      "value": "{{yourBaseUrl}}",
+                      "key": "yourBaseUrl"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"ResultCode\": 0,\n  \"Message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "a37e0aa1-935c-4ff9-92c1-38ddf3cb8211",
+          "name": "PathLeave - player left / disconnected",
+          "request": {
+            "name": "PathLeave - player left / disconnected",
+            "description": {
+              "content": "Called when a player leaves or disconnects from a room.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "Leave"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "type": "any",
+                  "value": "{{yourBaseUrl}}",
+                  "key": "yourBaseUrl"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "5fcb16a1-cf58-4652-98fc-00a82d7e2255",
+              "name": "Acknowledgement.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "Leave"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "type": "any",
+                      "value": "{{yourBaseUrl}}",
+                      "key": "yourBaseUrl"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"ResultCode\": 0,\n  \"Message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "75850540-9c58-4596-a2a8-c8338f30e54f",
+          "name": "PathEvent - client raised a forwarded custom event",
+          "request": {
+            "name": "PathEvent - client raised a forwarded custom event",
+            "description": {
+              "content": "Called when a client raises a custom event with the `HttpForward` web flag set, forwarding the event data to your service.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "Event"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "type": "any",
+                  "value": "{{yourBaseUrl}}",
+                  "key": "yourBaseUrl"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\",\n  \"Data\": {\n    \"key_0\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "a7f39315-436d-4677-a8e1-e83402ae7733",
+              "name": "Acknowledgement.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "Event"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "type": "any",
+                      "value": "{{yourBaseUrl}}",
+                      "key": "yourBaseUrl"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\",\n  \"Data\": {\n    \"key_0\": 4667\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"ResultCode\": 0,\n  \"Message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "a7104e07-5177-41ca-9280-bb77cb8bd018",
+          "name": "PathGameProperties - room or player property changed",
+          "request": {
+            "name": "PathGameProperties - room or player property changed",
+            "description": {
+              "content": "Called when a client sets a room or player property with the `HttpForward` web flag set.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "GameProperties"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "type": "any",
+                  "value": "{{yourBaseUrl}}",
+                  "key": "yourBaseUrl"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\",\n  \"Properties\": {\n    \"key_0\": 4317.733211557985\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "cb49075c-be28-4d2b-a656-5f81acc85cb4",
+              "name": "Acknowledgement.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "GameProperties"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "type": "any",
+                      "value": "{{yourBaseUrl}}",
+                      "key": "yourBaseUrl"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\",\n  \"Properties\": {\n    \"key_0\": \"string\",\n    \"key_1\": false\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"ResultCode\": 0,\n  \"Message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "dc7990b3-b64c-488f-b7ea-407514715432",
+          "name": "PathClose - room removed from server memory",
+          "request": {
+            "name": "PathClose - room removed from server memory",
+            "description": {
+              "content": "Called before Photon removes a room from server memory. `ActorNr`, `UserId`, and `NickName` are not included, unlike other webhook calls.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "Close"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "type": "any",
+                  "value": "{{yourBaseUrl}}",
+                  "key": "yourBaseUrl"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "a0112add-4446-456c-b033-b15f0715590c",
+              "name": "Acknowledgement, optionally including final `State` for persistence.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "Close"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "type": "any",
+                      "value": "{{yourBaseUrl}}",
+                      "key": "yourBaseUrl"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"AppId\": \"<string>\",\n  \"AppVersion\": \"<string>\",\n  \"Region\": \"<string>\",\n  \"GameId\": \"<string>\",\n  \"Type\": \"<string>\",\n  \"ActorNr\": \"<integer>\",\n  \"UserId\": \"<string>\",\n  \"NickName\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"ResultCode\": 0,\n  \"Message\": \"string\",\n  \"State\": {\n    \"key_0\": true\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "https://your-service.example.com",
+      "key": "yourBaseUrl"
+    },
+    {
+      "type": "string",
+      "value": "{{yourBaseUrl}}",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "7d98e3ae-2e49-4e39-9aa8-309b616807a6",
+    "name": "Photon WebHooks and Webservice Contract Custom Authentication Room Lifecycle WebHooks API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "IMPORTANT SCOPE NOTE: Photon Engine does not publish a general-purpose REST API that developers call. Photon's core products (Realtime, PUN, Fusion, Quantum, Voice, Chat) speak a proprietary binary protocol over UDP, TCP, or WebSocket - modeled separately in asyncapi/photonengine-asyncapi.yml, not here.\nThis document instead models the two genuinely HTTP surfaces in the Photon stack, both of which run in the opposite direction from a typical provider API: Photon's Game Server is the HTTP *client*, and the game developer must implement and host the HTTP *server* that Photon calls.\n1. Room Lifecycle WebHooks - Photon POSTs JSON payloads to a\n   developer-configured BaseUrl at points in a room's lifecycle\n   (creation, before join, join, leave, custom event, property change,\n   close), documented at\n   https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks\n   and https://doc.photonengine.com/server/current/applications/loadbalancing/webhooks.\n\n2. Custom Authentication - when enabled, Photon's server forwards a\n   connecting client's authentication values to a developer-configured\n   AuthUrl and expects a JSON verdict, documented at\n   https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication.\n\nThe paths below are written from the developer's point of view: each `path` is an endpoint you implement on your own server, appended to the BaseUrl / AuthUrl you register in the Photon Dashboard. Photon issues the request; your server returns the response. There is no Photon-hosted base URL to call for any of this - `servers` below is a placeholder for your own webhook receiver.\n\nContact Support:\n Name: Photon Engine",
+      "type": "text/plain"
+    }
+  }
+}

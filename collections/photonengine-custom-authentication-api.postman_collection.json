@@ -1,0 +1,143 @@
+{
+  "item": [
+    {
+      "id": "e50b62de-36a6-4844-b369-1b33d977c52b",
+      "name": "Custom Authentication",
+      "description": {
+        "content": "Endpoint Photon's server calls to validate a connecting client's credentials. You implement this; Photon is the caller.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "9797dad1-2b46-4bf5-8e3f-11172b9d088b",
+          "name": "Custom Authentication verdict endpoint",
+          "request": {
+            "name": "Custom Authentication verdict endpoint",
+            "description": {
+              "content": "Placeholder path representing the AuthUrl registered in the Photon Dashboard for Custom Authentication. Photon's server forwards the client-supplied authentication values (as query-string parameters by default, or as a POST body depending on configuration) and expects a JSON verdict deciding whether the connection is allowed. The exact parameter names are whatever the client sends as AuthenticationValues; Photon does not itself define them.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "CustomAuth"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "token",
+                  "value": "<string>",
+                  "description": "Example client-supplied credential parameter. Real parameter names are defined by the game's own AuthenticationValues, not by Photon."
+                }
+              ],
+              "variable": [
+                {
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "type": "any",
+                  "value": "{{yourBaseUrl}}",
+                  "key": "yourBaseUrl"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "9909932e-1f82-4003-809a-78643ac9249a",
+              "name": "Authentication verdict. `ResultCode: 1` (or equivalent success indicator per the developer's own contract) allows the connection; Data may carry additional values merged into the client's custom authentication result.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "CustomAuth"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": {
+                        "content": "",
+                        "type": "text/plain"
+                      },
+                      "type": "any",
+                      "value": "{{yourBaseUrl}}",
+                      "key": "yourBaseUrl"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"ResultCode\": 3381,\n  \"Data\": {\n    \"key_0\": 1262.85433316626\n  },\n  \"Message\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "https://your-service.example.com",
+      "key": "yourBaseUrl"
+    },
+    {
+      "type": "string",
+      "value": "{{yourBaseUrl}}",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "2c135cfe-0f8a-4aa2-a96f-98ab28b3abfb",
+    "name": "Photon WebHooks and Webservice Contract Custom Authentication API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "IMPORTANT SCOPE NOTE: Photon Engine does not publish a general-purpose REST API that developers call. Photon's core products (Realtime, PUN, Fusion, Quantum, Voice, Chat) speak a proprietary binary protocol over UDP, TCP, or WebSocket - modeled separately in asyncapi/photonengine-asyncapi.yml, not here.\nThis document instead models the two genuinely HTTP surfaces in the Photon stack, both of which run in the opposite direction from a typical provider API: Photon's Game Server is the HTTP *client*, and the game developer must implement and host the HTTP *server* that Photon calls.\n1. Room Lifecycle WebHooks - Photon POSTs JSON payloads to a\n   developer-configured BaseUrl at points in a room's lifecycle\n   (creation, before join, join, leave, custom event, property change,\n   close), documented at\n   https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks\n   and https://doc.photonengine.com/server/current/applications/loadbalancing/webhooks.\n\n2. Custom Authentication - when enabled, Photon's server forwards a\n   connecting client's authentication values to a developer-configured\n   AuthUrl and expects a JSON verdict, documented at\n   https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication.\n\nThe paths below are written from the developer's point of view: each `path` is an endpoint you implement on your own server, appended to the BaseUrl / AuthUrl you register in the Photon Dashboard. Photon issues the request; your server returns the response. There is no Photon-hosted base URL to call for any of this - `servers` below is a placeholder for your own webhook receiver.\n\nContact Support:\n Name: Photon Engine",
+      "type": "text/plain"
+    }
+  }
+}

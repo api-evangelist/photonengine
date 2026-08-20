@@ -36,6 +36,14 @@ image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/photonengi
 tags:
 - Gaming
 - Multiplayer
+- Real-Time
+- Netcode
+- Game Networking
+- WebSocket
+- Binary Protocol
+tags_raw:
+- Gaming
+- Multiplayer
 - Realtime
 - Netcode
 - Game Networking
@@ -48,6 +56,12 @@ apis:
 - aid: photonengine:photonengine-realtime-transport-api
   name: Photon Realtime Transport Protocol
   tags:
+  - Real-Time
+  - Binary Protocol
+  - UDP
+  - TCP
+  - WebSocket
+  tags_raw:
   - Realtime
   - Binary Protocol
   - UDP

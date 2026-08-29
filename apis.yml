@@ -20,6 +20,18 @@ description: >-
   a developer-hosted HTTP(S) endpoint to validate client tokens before
   allowing a connection). Pricing and account management are handled through
   the Photon Cloud Dashboard web UI, not a documented public REST API.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: freemium
   onboarding: unknown

@@ -1,7 +1,7 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Photon WebHooks and Webservice Contract Custom Authentication Room Lifecycle WebHooks API
-  description: "IMPORTANT SCOPE NOTE: Photon Engine does not publish a general-purpose REST API that developers call. Photon's core products (Realtime, PUN, Fusion, Quantum, Voice, Chat) speak a proprietary binary protocol over UDP, TCP, or WebSocket - modeled separately in asyncapi/photonengine-asyncapi.yml, not here.\nThis document instead models the two genuinely HTTP surfaces in the Photon stack, both of which run in the opposite direction from a typical provider API: Photon's Game Server is the HTTP *client*, and the game developer must implement and host the HTTP *server* that Photon calls.\n1. Room Lifecycle WebHooks - Photon POSTs JSON payloads to a\n   developer-configured BaseUrl at points in a room's lifecycle\n   (creation, before join, join, leave, custom event, property change,\n   close), documented at\n   https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks\n   and https://doc.photonengine.com/server/current/applications/loadbalancing/webhooks.\n\n2. Custom Authentication - when enabled, Photon's server forwards a\n   connecting client's authentication values to a developer-configured\n   AuthUrl and expects a JSON verdict, documented at\n   https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication.\n\nThe paths below are written from the developer's point of view: each `path` is an endpoint you implement on your own server, appended to the BaseUrl / AuthUrl you register in the Photon Dashboard. Photon issues the request; your server returns the response. There is no Photon-hosted base URL to call for any of this - `servers` below is a placeholder for your own webhook receiver."
+  title: Photon WebHooks and Custom Authentication Webservice…
+  description: 'IMPORTANT SCOPE NOTE: Photon Engine does not publish a general-purpose REST API that developers call.'
   version: '1.0'
   contact:
     name: Photon Engine
@@ -175,6 +175,20 @@ paths:
                 $ref: '#/components/schemas/WebhookLoadResponse'
 components:
   schemas:
+    WebhookLoadResponse:
+      type: object
+      required:
+      - ResultCode
+      properties:
+        ResultCode:
+          type: integer
+          example: 0
+        Message:
+          type: string
+        State:
+          type: object
+          additionalProperties: true
+          description: Serialized room state, returned on a Type "Load" PathCreate call or an optional PathClose call for persistent rooms.
     WebhookResultResponse:
       type: object
       required:
@@ -221,17 +235,3 @@ components:
         NickName:
           type: string
           description: The nickname of the triggering player (omitted on PathClose).
-    WebhookLoadResponse:
-      type: object
-      required:
-      - ResultCode
-      properties:
-        ResultCode:
-          type: integer
-          example: 0
-        Message:
-          type: string
-        State:
-          type: object
-          additionalProperties: true
-          description: Serialized room state, returned on a Type "Load" PathCreate call or an optional PathClose call for persistent rooms.

@@ -175,18 +175,6 @@ paths:
                 $ref: '#/components/schemas/WebhookLoadResponse'
 components:
   schemas:
-    WebhookResultResponse:
-      type: object
-      required:
-      - ResultCode
-      properties:
-        ResultCode:
-          type: integer
-          description: 0 indicates success; any non-zero value is treated as a failure.
-          example: 0
-        Message:
-          type: string
-          description: Optional human-readable message, surfaced in Photon logs on failure.
     WebhookLoadResponse:
       type: object
       required:
@@ -201,6 +189,18 @@ components:
           type: object
           additionalProperties: true
           description: Serialized room state, returned on a Type "Load" PathCreate call or an optional PathClose call for persistent rooms.
+    WebhookResultResponse:
+      type: object
+      required:
+      - ResultCode
+      properties:
+        ResultCode:
+          type: integer
+          description: 0 indicates success; any non-zero value is treated as a failure.
+          example: 0
+        Message:
+          type: string
+          description: Optional human-readable message, surfaced in Photon logs on failure.
     WebhookRequestCommon:
       type: object
       description: Fields common to every Room Lifecycle WebHook call except PathClose, which omits ActorNr, UserId, and NickName.

@@ -62,7 +62,7 @@ tags_raw:
 - WebSocket
 - Binary Protocol
 created: '2026-07-03'
-modified: '2026-07-03'
+modified: '2026-10-06'
 specificationVersion: '0.23'
 apis:
 - aid: photonengine:photonengine-realtime-transport-api
@@ -248,6 +248,8 @@ apis:
     url: >-
       https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication
 common:
+- url: https://blog.photonengine.com/feed/
+  type: BlogRSS
 - type: AgenticAccess
   url: agentic-access/photonengine-agentic-access.yml
 - type: VulnerabilityDisclosure

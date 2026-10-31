@@ -1,4 +1,4 @@
-# Photon Engine (photonengine)
+# Photon Engine
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,125 +64,143 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Photon Engine (Exit Games) builds cross-platform multiplayer game networking backends - Photon Fusion, Photon Quantum, Photon Unity Networking (PUN), Photon Voice, Photon Chat, and the legacy Photon Bolt - all layered on the proprietary Photon Realtime transport protocol. Photon's core product is **protocol-first and SDK-first, not REST-first**: game clients exchange a custom binary message format (operation requests, operation responses, and events) with Name Server, Master Server, and Game Server roles, over UDP or TCP by default and, importantly, over **WebSocket** (`ws://` unsecured, `wss://` secured on port 443) as a first-class documented transport for WebGL and browser-hosted clients.
+Photon Engine (Exit Games) builds cross-platform multiplayer game networking backends - Photon Fusion, Photon Quantum, Photon Unity Networking (PUN), Photon Voice, Photon Chat, and the legacy Photon Bolt - all layered on the proprietary Photon Realtime transport protocol. Photon's core product is protocol-first and SDK-first, not REST-first - game clients exchange a custom binary message format (operation requests, operation responses, and events) with Name Server, Master Server, and Game Server roles, over UDP or TCP by default and, importantly, over WebSocket (ws:// unsecured, wss:// secured on port 443) as a first-class documented transport for WebGL and browser-hosted clients. Photon's own hosted surface exposes no general-purpose callable REST API for gameplay; the only genuinely HTTP surfaces are outbound - Room Lifecycle WebHooks (Photon POSTs room/join/leave/event/property/close notifications to a developer-hosted URL) and the Custom Authentication webservice contract (Photon calls out to a developer-hosted HTTP(S) endpoint to validate client tokens before allowing a connection). Pricing and account management are handled through the Photon Cloud Dashboard web UI, not a documented public REST API.
 
-Photon's own hosted surface exposes no general-purpose callable REST API for gameplay. The only genuinely HTTP surfaces run in reverse: **Room Lifecycle WebHooks** (Photon's Game Server POSTs room/join/leave/event/property/close notifications to a developer-hosted URL) and the **Custom Authentication webservice contract** (Photon calls out to a developer-hosted HTTP(S) endpoint to validate client tokens before allowing a connection). Account management and CCU/billing are handled through the Photon Cloud Dashboard web UI, not a documented public REST API.
+**Areas:** Gaming · Multiplayer · Real-Time · Netcode · Game Networking · WebSocket · Binary Protocol
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/photonengine/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/photonengine/refs/heads/main/apis.yml)
+## Photon Engine on APIs.io
 
-## Protocol reality check
+Everything profiled for Photon Engine is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/photonengine/](https://apis.io/providers/photonengine/)** — or go straight to one of the APIs or properties below.
 
-- **Realtime Transport Protocol** - the actual wire protocol. Binary operation requests/responses/events over UDP (default), TCP, or WebSocket. Documented in [Realtime Intro](https://doc.photonengine.com/realtime/current/getting-started/realtime-intro) and the [Binary Protocol reference](https://doc.photonengine.com/realtime/current/reference/binary-protocol).
-- **WebSocket is real and documented**, not a workaround: clients set `ConnectionProtocol` to `WebSocket` (`ws://`, port 80) or `WebSocketSecure` (`wss://`, port 443); self-hosted Photon Server's WebSocket listener defaults to port 9090 (Master) / 9091 (GameServer secure); Photon Cloud's equivalent listener is port 19090. See [Secure Networks](https://doc.photonengine.com/realtime/current/connection-and-authentication/secure-networks) and [WebSocket SSL Setup](https://doc.photonengine.com/server/v4/operations/websockets-ssl-setup). WebSocket is the transport used by WebGL and other browser-hosted clients that cannot open raw sockets.
-- **The payload over that WebSocket connection is still Photon's proprietary binary protocol**, not JSON. `asyncapi/photonengine-asyncapi.yml` models the connection life cycle and the operation/event envelope structure honestly, with an explicit `isJson: false` note - it is not a claim that Photon runs a JSON WebSocket chat API.
-- **PUN, Fusion, Quantum, Voice, and Chat** are all SDK/product layers on top of the same Realtime transport (Voice explicitly documents that it "is built on top of Photon Realtime and inherits all of its features"). None of them introduce a separate REST surface.
-- **Bolt** is Photon's legacy, no-longer-actively-developed netcode product, listed here for completeness alongside PUN/Fusion/Quantum/Voice/Chat, but is deprecated in favor of Fusion.
-- **Room Lifecycle WebHooks** and **Custom Authentication** are the one genuinely HTTP-shaped surface in the stack - but Photon is the HTTP *client* and the game developer hosts the HTTP *server*. See [WebHooks](https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks) and [Custom Authentication](https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication).
-- No `collections/` artifact was produced: a Postman/Open Collection models "calls I make to a provider's API," and there is no provider-hosted, developer-callable REST API here to call - the WebHooks/Custom Auth contract is the reverse of that shape.
+### APIs (9)
 
-## Tags
+- [Photon Realtime Transport Protocol](https://apis.io/apis/photonengine/photonengine-realtime-transport-api/) — The core Photon protocol - NOT a REST or JSON API. Clients connect through a Name Server to a Master Server (matchmaking/lobby) and then a Game Server (room…
+- [Photon PUN (Photon Unity Networking) API](https://apis.io/apis/photonengine/photonengine-pun-api/) — Photon Unity Networking 2, the original high-level Unity multiplayer SDK layered over the Photon Realtime transport protocol (same binary messages, same…
+- [Photon Fusion Networking API](https://apis.io/apis/photonengine/photonengine-fusion-api/) — Photon's current-generation, high-level networking framework for Unity, supporting Shared Mode, Client-Host, and dedicated Server Mode topologies with…
+- [Photon Quantum Deterministic Simulation API](https://apis.io/apis/photonengine/photonengine-quantum-api/) — Photon's deterministic, ECS-based simulation framework that ships player inputs (not state) across all clients in lockstep, re-simulating identically on…
+- [Photon Voice API](https://apis.io/apis/photonengine/photonengine-voice-api/) — Cross-platform low-latency voice chat built directly on top of Photon Realtime - it inherits Realtime's matchmaking, rooms, and interest groups and streams…
+- [Photon Chat API](https://apis.io/apis/photonengine/photonengine-chat-api/) — A separately billed Photon Cloud service (its own AppId type) for text messaging, presence, and friend lists, dedicated Chat Servers speaking the same…
+- [Photon Bolt (Legacy, Deprecated)](https://apis.io/apis/photonengine/photonengine-bolt-api/) — Legacy UDP-based Unity netcode product from Exit Games. No longer actively developed and not recommended for new projects - superseded by Photon Fusion.…
+- [Photon Engine Custom Authentication API](https://apis.io/apis/photonengine/photonengine-custom-authentication-api/) — Endpoint Photon's server calls to validate a connecting client's credentials. You implement this; Photon is the caller.
+- [Photon Engine Room Lifecycle WebHooks API](https://apis.io/apis/photonengine/photonengine-room-lifecycle-webhooks-api/) — Endpoints Photon's Game Server calls (HTTP POST) at points in a room's lifecycle. You implement these; Photon is the caller.
 
-- Gaming
-- Multiplayer
-- Realtime
-- Netcode
-- Game Networking
-- WebSocket
-- Binary Protocol
+### Published properties
 
-## Timestamps
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-- **Created:** 2026-07-03
-- **Modified:** 2026-07-03
+#### AsyncAPI (1)
 
-## APIs
+Event-driven and webhook contracts.
 
-### Photon Realtime Transport Protocol
+- [Photon Realtime Transport Protocol over WebSocket](https://apis.io/asyncapis/photonengine/photonengine-asyncapi/)
 
-The core Photon protocol - not a REST or JSON API. Clients connect through a Name Server to a Master Server (matchmaking/lobby) and then a Game Server (room gameplay), exchanging a proprietary binary message format over UDP, TCP, or WebSocket.
+#### Event channels (1)
 
-- **Human URL:** [https://doc.photonengine.com/realtime/current/getting-started/realtime-intro](https://doc.photonengine.com/realtime/current/getting-started/realtime-intro)
-- **Base URL:** `wss://ns.exitgames.com:443`
+Individual events and webhooks the provider emits.
 
-#### Properties
+- [/photon/ws](https://apis.io/channels/photonengine/photon-ws/)
 
-- [Documentation](https://doc.photonengine.com/realtime/current/getting-started/realtime-intro)
-- [API Reference](https://doc.photonengine.com/realtime/current/reference/binary-protocol)
-- [AsyncAPI](asyncapi/photonengine-asyncapi.yml) — [AsyncAPI Specification](https://www.asyncapi.com/docs/reference/specification/latest)
+#### Agentic access (1)
 
-### Photon PUN (Photon Unity Networking) API
+Which operations an agent can call, which act, and which need a human in the loop.
 
-Legacy Unity multiplayer SDK layered over the Realtime transport protocol. Still supported for existing projects; Photon recommends Fusion or Quantum for new projects.
+- [Photonengine Agentic Access](https://apis.io/agentic-access/photonengine/photonengine-agentic-access/)
 
-- **Human URL:** [https://doc.photonengine.com/pun/current/getting-started/pun-intro](https://doc.photonengine.com/pun/current/getting-started/pun-intro)
+#### Collections (2)
 
-### Photon Fusion Networking API
+Postman and Open Collection request collections.
 
-Current-generation, high-level networking framework for Unity supporting Shared Mode, Client-Host, and dedicated Server Mode topologies with state-authoritative simulation.
+- [Photon WebHooks and Webservice Contract Custom Authentication API](https://apis.io/collections/photonengine/open-photonengine-custom-authentication-api/)
+- [Photon WebHooks and Webservice Contract Custom Authentication Room Lifecycle WebHooks API](https://apis.io/collections/photonengine/open-photonengine-room-lifecycle-webhooks-api/)
 
-- **Human URL:** [https://doc.photonengine.com/fusion/current/getting-started/fusion-intro](https://doc.photonengine.com/fusion/current/getting-started/fusion-intro)
+#### Governance rules (1)
 
-### Photon Quantum Deterministic Simulation API
+Spectral rulesets for the provider's contracts.
 
-Deterministic, ECS-based simulation framework that ships player inputs (not state) across all clients in lockstep.
+- [Photon Engine — asyncapi rules](https://apis.io/rules/photonengine/photonengine-asyncapi-spectral-rules/)
 
-- **Human URL:** [https://doc.photonengine.com/quantum/current/manual/introduction](https://doc.photonengine.com/quantum/current/manual/introduction)
+#### Security (2)
 
-### Photon Voice API
+Authentication, trust centre, and vulnerability disclosure.
 
-Cross-platform low-latency voice chat built directly on Photon Realtime, streaming Opus-encoded audio as Realtime events.
+- [Photonengine Domain Security](https://apis.io/security/photonengine/photonengine-domain-security/)
+- [Photonengine Vulnerability Disclosure](https://apis.io/security/photonengine/photonengine-vulnerability-disclosure/)
 
-- **Human URL:** [https://doc.photonengine.com/voice/current/getting-started/voice-intro](https://doc.photonengine.com/voice/current/getting-started/voice-intro)
+#### Plans and pricing (1)
 
-### Photon Chat API
+Published plans, tiers and prices.
 
-Separately billed Photon Cloud service for text messaging, presence, and friend lists over dedicated Chat Servers speaking the same Realtime-style binary protocol.
+- [Photonengine Plans Pricing](https://apis.io/plans/photonengine/photonengine-plans-pricing/)
 
-- **Human URL:** [https://doc.photonengine.com/chat/current/getting-started/chat-intro](https://doc.photonengine.com/chat/current/getting-started/chat-intro)
+#### Rate limits (1)
 
-### Photon Bolt (Legacy, Deprecated)
+Published request limits.
 
-Legacy UDP-based Unity netcode product, no longer actively developed, superseded by Photon Fusion.
+- [Photonengine Rate Limits](https://apis.io/rate-limits/photonengine/photonengine-rate-limits/)
 
-- **Human URL:** [https://doc.photonengine.com/bolt/current/getting-started/bolt-intro](https://doc.photonengine.com/bolt/current/getting-started/bolt-intro)
+#### FinOps (1)
 
-### Photon Room Lifecycle WebHooks
+What the API costs to run, by operation.
 
-Outbound HTTP POST callbacks (PathCreate, PathBeforeJoin, PathJoin, PathLeave, PathEvent, PathGameProperties, PathClose) that Photon's Game Server sends to a developer-hosted BaseUrl.
+- [Photonengine Finops](https://apis.io/finops/photonengine/photonengine-finops/)
 
-- **Human URL:** [https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks](https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks)
+## Where to find this API
 
-#### Properties
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
-- [Documentation](https://doc.photonengine.com/realtime/current/gameplay/web-extensions/webhooks)
-- [OpenAPI](openapi/photonengine-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-
-### Photon Custom Authentication Webservice Contract
-
-Outbound HTTP call Photon's server makes to a developer-hosted AuthUrl to validate a connecting client's credentials.
-
-- **Human URL:** [https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication](https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication)
-
-#### Properties
-
-- [Documentation](https://doc.photonengine.com/realtime/current/connection-and-authentication/authentication/custom-authentication)
-- [OpenAPI](openapi/photonengine-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-
-## Common Properties
-
-- [GitHub Organization](https://github.com/exitgames)
-- [LinkedIn](https://www.linkedin.com/company/photon-engine)
 - [Website](https://www.photonengine.com)
 - [Documentation](https://doc.photonengine.com)
-- [Plans](plans/photonengine-plans-pricing.yml)
-- [Rate Limits](rate-limits/photonengine-rate-limits.yml)
-- [Fin Ops](finops/photonengine-finops.yml)
+- [GitHub](https://github.com/exitgames)
 
-## Review
+## API Evangelist rating
 
-Does Photon Engine expose a documented public WebSocket API? **Yes** - see [review.yml](review.yml) for the full findings. Photon documents `ws://`/`wss://` as an official transport for its Realtime protocol (used heavily by WebGL clients), distinct from the binary payload it carries (not JSON).
+**Kin Score 24.1** — emerging · rubric 0.24.0 · scored 2026-10-17
 
-## Maintainers
+| Facet | Score |
+|---|---|
+| Discoverability | 66.1 |
+| Contract quality | 50.7 |
+| Contract governance | 13.6 |
+| Operational transparency | 10.5 |
+| Developer ergonomics | 7.1 |
+| Access clarity | 7.9 |
 
-**FN:** Kin Lane
-**Email:** kin@apievangelist.com
+**Agent readiness 16.5** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | — |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | derived (partial credit) |
+| Event Surface Described | derived (partial credit) |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 11.8** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/photonengine/](https://apis.io/providers/photonengine/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Photon Engine: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/photonengine/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
